@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3D Vector Field Visualization</title>
+    <!-- Include Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Include Math.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.min.js"></script>
+    <!-- Optional: Include CSS for styling -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+        }
+        input {
+            width: 300px;
+        }
+        #plot {
+            width: 100%;
+            height: 600px;
+        }
+        #generate-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<h1>3D Vector Field Visualization</h1>
+
+<p>Enter the x, y, and z components of the vector field as functions of x, y, and z. You can use standard mathematical functions like sin, cos, exp, log, sqrt, etc.</p>
+
+<div class="input-group">
+    <label for="u-input">Enter u(x, y, z):</label>
+    <input type="text" id="u-input" value="y">
+</div>
+<div class="input-group">
+    <label for="v-input">Enter v(x, y, z):</label>
+    <input type="text" id="v-input" value="-x">
+</div>
+<div class="input-group">
+    <label for="w-input">Enter w(x, y, z):</label>
+    <input type="text" id="w-input" value="0">
+</div>
+<button id="generate-btn">Generate Plot</button>
+
+<div id="plot"></div>
+
+<div id="footer">
+    &copy; 2023 Vector Field Visualizer. Powered by Plotly.js and Math.js.
+</div>
+
+<script>
+    // Define the grid parameters
+    const x_min = -1, x_max = 1, x_num = 10;
+    const y_min = -1, y_max = 1, y_num = 10;
+    const z_min = -1, z_max = 1, z_num = 10;
+
+    // Generate grid points
+    const x_vals = math.range(x_min, x_max, (x_max - x_min) / (x_num - 1), true).toArray();
+    const y_vals = math.range(y_min, y_max, (y_max - y_min) / (y_num - 1), true).toArray();
+    const z_vals = math.range(z_min, z_max, (z_max - z_min) / (z_num - 1), true).toArray();
+
+    // Function to evaluate expressions safely
+    function evaluateExpression(expr, scope) {
+        try {
+            // Parse the expression once
+            const code = math.compile(expr);
+            // Evaluate the expression with the given scope (variables)
+            return code.evaluate(scope);
+        } catch (err) {
+            alert('Error in expression: ' + expr + '\n' + err);
+            throw err;
+        }
+    }
+
+    // Function to generate the vector field data
+    function generateVectorField(u_expr, v_expr, w_expr) {
+        const x = [];
+        const y = [];
+        const z = [];
+        const u = [];
+        const v = [];
+        const w = [];
+
+        for (let xi of x_vals) {
+            for (let yi of y_vals) {
+                for (let zi of z_vals) {
+                    const scope = { x: xi, y: yi, z: zi, pi: Math.PI, e: Math.E };
+
+                    x.push(xi);
+                    y.push(yi);
+                    z.push(zi);
+
+                    u.push(evaluateExpression(u_expr, scope));
+                    v.push(evaluateExpression(v_expr, scope));
+                    w.push(evaluateExpression(w_expr, scope));
+                }
+            }
+        }
+
+        return { x, y, z, u, v, w };
+    }
+
+    // Function to create the plot
+    function createPlot() {
+        // Get user input
+        const u_expr = document.getElementById('u-input').value;
+        const v_expr = document.getElementById('v-input').value;
+        const w_expr = document.getElementById('w-input').value;
+
+        // Generate vector field data
+        let data;
+        try {
+            data = generateVectorField(u_expr, v_expr, w_expr);
+        } catch (err) {
+            // Error already handled in evaluateExpression
+            return;
+        }
+
+        // Create the Plotly data trace
+        const trace = {
+            type: 'cone',
+            x: data.x,
+            y: data.y,
+            z: data.z,
+            u: data.u,
+            v: data.v,
+            w: data.w,
+            colorscale: 'Viridis',
+            sizemode: 'absolute',
+            sizeref: 2,
+            showscale: false,
+            anchor: 'tail'
+        };
+
+        // Define the layout
+        const layout = {
+            scene: {
+                xaxis: { title: 'X', range: [x_min, x_max] },
+                yaxis: { title: 'Y', range: [y_min, y_max] },
+                zaxis: { title: 'Z', range: [z_min, z_max] },
+                aspectmode: 'cube',
+                camera: {
+                    up: { x: 0, y: 0, z: 1 },
+                    eye: { x: 1.25, y: 1.25, z: 1.25 }
+                }
+            },
+            title: '3D Vector Field Visualization',
+            margin: { t: 50 }
+        };
+
+        // Plot the data
+        Plotly.newPlot('plot', [trace], layout);
+    }
+
+    // Attach event listener to the button
+    document.getElementById('generate-btn').addEventListener('click', createPlot);
+
+    // Generate the initial plot
+    createPlot();
+</script>
+
+</body>
+</html>
