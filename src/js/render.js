@@ -1,3 +1,6 @@
+import { range, compile } from "mathjs";
+import Plotly from 'plotly.js-dist-min';
+
 const x_min = -1,
   x_max = 1,
   x_num = 10;
@@ -8,19 +11,19 @@ const z_min = -1,
   z_max = 1,
   z_num = 10;
 
-const x_vals = math
-  .range(x_min, x_max, (x_max - x_min) / (x_num - 1), true)
+const x_vals = 
+  range(x_min, x_max, (x_max - x_min) / (x_num - 1), true)
   .toArray();
-const y_vals = math
-  .range(y_min, y_max, (y_max - y_min) / (y_num - 1), true)
+const y_vals =
+  range(y_min, y_max, (y_max - y_min) / (y_num - 1), true)
   .toArray();
-const z_vals = math
-  .range(z_min, z_max, (z_max - z_min) / (z_num - 1), true)
+const z_vals =
+  range(z_min, z_max, (z_max - z_min) / (z_num - 1), true)
   .toArray();
 
 function evaluateExpression(expr, parseConfig) {
   try {
-    const code = math.compile(expr);
+    const code = compile(expr);
     return code.evaluate(parseConfig);
   } catch (err) {
     alert("Error in expression: " + expr + "\n" + err);
