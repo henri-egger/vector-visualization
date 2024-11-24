@@ -5,12 +5,10 @@ import "../scss/styles.scss";
 import * as bootstrap from "bootstrap";
 
 import { renderPlot } from "./render";
-import { handleSubmit, updateForm } from "./form";
-
-const componentsForm = document.getElementById("components-form");
-componentsForm.addEventListener("submit", handleSubmit);
+import { updateForm, setupForm } from "./form";
 
 window.onload = () => {
+  setupForm();
   updateForm();
   renderPlot();
 };
