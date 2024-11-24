@@ -1,5 +1,5 @@
 import { range, compile } from "mathjs";
-import Plotly from 'plotly.js-dist-min';
+import Plotly from "plotly.js-dist-min";
 import { lsGet } from "./localstorage";
 
 const x_min = -1,
@@ -12,15 +12,24 @@ const z_min = -1,
   z_max = 1,
   z_num = 10;
 
-const x_vals = 
-  range(x_min, x_max, (x_max - x_min) / (x_num - 1), true)
-  .toArray();
-const y_vals =
-  range(y_min, y_max, (y_max - y_min) / (y_num - 1), true)
-  .toArray();
-const z_vals =
-  range(z_min, z_max, (z_max - z_min) / (z_num - 1), true)
-  .toArray();
+const x_vals = range(
+  x_min,
+  x_max,
+  (x_max - x_min) / (x_num - 1),
+  true
+).toArray();
+const y_vals = range(
+  y_min,
+  y_max,
+  (y_max - y_min) / (y_num - 1),
+  true
+).toArray();
+const z_vals = range(
+  z_min,
+  z_max,
+  (z_max - z_min) / (z_num - 1),
+  true
+).toArray();
 
 function evaluateExpression(expr, parseConfig) {
   try {
@@ -100,7 +109,6 @@ export function renderPlot() {
         eye: { x: 1.25, y: 1.25, z: 1.25 },
       },
     },
-    title: "3D Vector Field Visualization",
     margin: { t: 50 },
   };
 
