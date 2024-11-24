@@ -60,7 +60,9 @@ function generateVectorField(u_expr, v_expr, w_expr) {
 }
 
 export function renderPlot() {
-  const { exprs } = lsGet("formData");
+  const data = lsGet("formData");
+  if (!data) return;
+  const { exprs } = data;
 
   const [u_expr, v_expr, w_expr] = exprs;
 

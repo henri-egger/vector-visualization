@@ -1,7 +1,9 @@
 export function lsSet(name, object) {
-  localStorage.setItem(name, JSON.stringify({ obj: obj }));
+  localStorage.setItem(name, JSON.stringify({ obj: object }));
 }
 
 export function lsGet(name) {
-  return JSON.parse(localStorage.getItem(name)).obj;
+  const json = JSON.parse(localStorage.getItem(name));
+  if (!json) return null;
+  return json.obj;
 }

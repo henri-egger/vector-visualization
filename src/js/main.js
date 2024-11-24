@@ -5,9 +5,12 @@ import '../scss/styles.scss'
 import * as bootstrap from 'bootstrap'
 
 import { renderPlot } from './render';
-import { handleSubmit } from './form';
+import { handleSubmit, updateForm } from './form';
 
 const componentsForm = document.getElementById("components-form");
 componentsForm.addEventListener("submit", handleSubmit);
 
-window.onload = renderPlot;
+window.onload = () => {
+  updateForm()
+  renderPlot()
+};
