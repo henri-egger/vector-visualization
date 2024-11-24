@@ -9,3 +9,5 @@ import { handleSubmit } from './form';
 
 const componentsForm = document.getElementById("components-form");
 componentsForm.addEventListener("submit", handleSubmit);
+
+window.onload = renderPlot;
