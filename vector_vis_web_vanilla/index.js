@@ -15,7 +15,13 @@ function handleSubmit(e) {
     formData.get("input-z"),
   ];
 
-  renderPlot(exprs);
+  const data = {
+    exprs: exprs,
+  }
+
+  localStorage.setItem("formData", JSON.stringify(data));
+
+  renderPlot();
 }
 
 // --- Plotting ---
@@ -76,7 +82,9 @@ function generateVectorField(u_expr, v_expr, w_expr) {
   return { x, y, z, u, v, w };
 }
 
-function renderPlot(exprs) {
+function renderPlot() {
+  const { exprs } = JSON.parse(localStorage.getItem("formData"));
+
   const [u_expr, v_expr, w_expr] = exprs;
 
   let fieldData;
@@ -119,3 +127,5 @@ function renderPlot(exprs) {
 
   Plotly.newPlot("plot", [trace], layout);
 }
+
+renderPlot();
