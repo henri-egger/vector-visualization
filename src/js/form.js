@@ -1,6 +1,7 @@
 // TODO: Store components as cookie
 
 import { renderPlot } from "./render";
+import { lsSet } from "./localstorage";
 
 export function handleSubmit(e) {
   e.preventDefault();
@@ -18,7 +19,7 @@ export function handleSubmit(e) {
     exprs: exprs,
   }
 
-  localStorage.setItem("formData", JSON.stringify(data));
+  lsSet("formData", data);
 
   renderPlot();
 }
