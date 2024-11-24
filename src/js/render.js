@@ -2,34 +2,31 @@ import { range, compile } from "mathjs";
 import Plotly from "plotly.js-dist-min";
 import { lsGet } from "./localstorage";
 
-const x_min = -1,
-  x_max = 1,
-  x_num = 10;
-const y_min = -1,
-  y_max = 1,
-  y_num = 10;
-const z_min = -1,
-  z_max = 1,
-  z_num = 10;
+function computeAxisVals(axisRange, arrowDensity) {
+  const min = -axisRange;
+  const max = axisRange;
+  console.log(axisRange, arrowDensity);
+  const xVals = range(
+    min,
+    max,
+    (max - min) / (arrowDensity - 1),
+    true
+  ).toArray();
+  const yVals = range(
+    min,
+    max,
+    (max - min) / (arrowDensity - 1),
+    true
+  ).toArray();
+  const zVals = range(
+    min,
+    max,
+    (max - min) / (arrowDensity - 1),
+    true
+  ).toArray();
 
-const x_vals = range(
-  x_min,
-  x_max,
-  (x_max - x_min) / (x_num - 1),
-  true
-).toArray();
-const y_vals = range(
-  y_min,
-  y_max,
-  (y_max - y_min) / (y_num - 1),
-  true
-).toArray();
-const z_vals = range(
-  z_min,
-  z_max,
-  (z_max - z_min) / (z_num - 1),
-  true
-).toArray();
+  return [xVals, yVals, zVals];
+}
 
 function evaluateExpression(expr, parseConfig) {
   try {
@@ -41,7 +38,9 @@ function evaluateExpression(expr, parseConfig) {
   }
 }
 
-function generateVectorField(u_expr, v_expr, w_expr) {
+function generateVectorField(u_expr, v_expr, w_expr, axisRange, arrowDensity) {
+  const [xVals, yVals, zVals] = computeAxisVals(axisRange, arrowDensity);
+
   const x = [];
   const y = [];
   const z = [];
@@ -49,9 +48,9 @@ function generateVectorField(u_expr, v_expr, w_expr) {
   const v = [];
   const w = [];
 
-  for (let xi of x_vals) {
-    for (let yi of y_vals) {
-      for (let zi of z_vals) {
+  for (let xi of xVals) {
+    for (let yi of yVals) {
+      for (let zi of zVals) {
         const parseConfig = { x: xi, y: yi, z: zi, pi: Math.PI, e: Math.E };
 
         x.push(xi);
@@ -71,13 +70,19 @@ function generateVectorField(u_expr, v_expr, w_expr) {
 export function renderPlot() {
   const data = lsGet("formData");
   if (!data) return;
-  const { exprs } = data;
+  const { exprs, axisRange, arrowSize, arrowDensity } = data;
 
   const [u_expr, v_expr, w_expr] = exprs;
 
   let fieldData;
   try {
-    fieldData = generateVectorField(u_expr, v_expr, w_expr);
+    fieldData = generateVectorField(
+      u_expr,
+      v_expr,
+      w_expr,
+      axisRange,
+      arrowDensity
+    );
   } catch (err) {
     // Error already handled in evaluateExpression
     return;
@@ -93,16 +98,16 @@ export function renderPlot() {
     w: fieldData.w,
     colorscale: "Viridis",
     sizemode: "absolute",
-    sizeref: 2,
+    sizeref: arrowSize,
     showscale: false,
     anchor: "tail",
   };
 
   const layout = {
     scene: {
-      xaxis: { title: "X", range: [x_min, x_max] },
-      yaxis: { title: "Y", range: [y_min, y_max] },
-      zaxis: { title: "Z", range: [z_min, z_max] },
+      xaxis: { title: "X", range: [-axisRange, axisRange] },
+      yaxis: { title: "Y", range: [-axisRange, axisRange] },
+      zaxis: { title: "Z", range: [-axisRange, axisRange] },
       aspectmode: "cube",
       camera: {
         up: { x: 0, y: 0, z: 1 },

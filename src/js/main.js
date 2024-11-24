@@ -8,7 +8,7 @@ import { renderPlot } from "./render";
 import { updateForm, setupForm } from "./form";
 
 window.onload = () => {
-  setupForm();
   updateForm();
+  setupForm();
   renderPlot();
 };
