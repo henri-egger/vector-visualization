@@ -1,5 +1,6 @@
 import { range, compile } from "mathjs";
 import Plotly from 'plotly.js-dist-min';
+import { lsGet } from "./localstorage";
 
 const x_min = -1,
   x_max = 1,
@@ -59,7 +60,7 @@ function generateVectorField(u_expr, v_expr, w_expr) {
 }
 
 export function renderPlot() {
-  const { exprs } = JSON.parse(localStorage.getItem("formData"));
+  const { exprs } = lsGet("formData");
 
   const [u_expr, v_expr, w_expr] = exprs;
 
