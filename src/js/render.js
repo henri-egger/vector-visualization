@@ -2,26 +2,34 @@ import { range, compile } from "mathjs";
 import Plotly from "plotly.js-dist-min";
 import { lsGet } from "./localstorage";
 
-function computeAxisVals(axisRange, arrowDensity) {
+function computeAxisVals(axisRange, arrowDensity, origin) {
   const min = -axisRange;
   const max = axisRange;
-  console.log(axisRange, arrowDensity);
+
+  const xMin = min + origin[0];
+  const xMax = max + origin[0];
   const xVals = range(
-    min,
-    max,
-    (max - min) / (arrowDensity - 1),
+    xMin,
+    xMax,
+    (xMax - xMin) / (arrowDensity - 1),
     true
   ).toArray();
+
+  const yMin = min + origin[1];
+  const yMax = max + origin[1];
   const yVals = range(
-    min,
-    max,
-    (max - min) / (arrowDensity - 1),
+    yMin,
+    yMax,
+    (xMax - yMin) / (arrowDensity - 1),
     true
   ).toArray();
+
+  const zMin = min + origin[2];
+  const zMax = max + origin[2];
   const zVals = range(
-    min,
-    max,
-    (max - min) / (arrowDensity - 1),
+    zMin,
+    zMax,
+    (xMax - zMin) / (arrowDensity - 1),
     true
   ).toArray();
 
@@ -38,8 +46,19 @@ function evaluateExpression(expr, parseConfig) {
   }
 }
 
-function generateVectorField(u_expr, v_expr, w_expr, axisRange, arrowDensity) {
-  const [xVals, yVals, zVals] = computeAxisVals(axisRange, arrowDensity);
+function generateVectorField(
+  u_expr,
+  v_expr,
+  w_expr,
+  axisRange,
+  arrowDensity,
+  origin
+) {
+  const [xVals, yVals, zVals] = computeAxisVals(
+    axisRange,
+    arrowDensity,
+    origin
+  );
 
   const x = [];
   const y = [];
@@ -70,7 +89,7 @@ function generateVectorField(u_expr, v_expr, w_expr, axisRange, arrowDensity) {
 export function renderPlot() {
   const data = lsGet("formData");
   if (!data) return;
-  const { exprs, axisRange, arrowSize, arrowDensity } = data;
+  const { exprs, axisRange, arrowSize, arrowDensity, origin } = data;
 
   const [u_expr, v_expr, w_expr] = exprs;
 
@@ -81,7 +100,8 @@ export function renderPlot() {
       v_expr,
       w_expr,
       axisRange,
-      arrowDensity
+      arrowDensity,
+      origin
     );
   } catch (err) {
     // Error already handled in evaluateExpression
@@ -105,9 +125,18 @@ export function renderPlot() {
 
   const layout = {
     scene: {
-      xaxis: { title: "X", range: [-axisRange, axisRange] },
-      yaxis: { title: "Y", range: [-axisRange, axisRange] },
-      zaxis: { title: "Z", range: [-axisRange, axisRange] },
+      xaxis: {
+        title: "X",
+        range: [-axisRange + origin[0], axisRange + origin[0]],
+      },
+      yaxis: {
+        title: "Y",
+        range: [-axisRange + origin[1], axisRange + origin[1]],
+      },
+      zaxis: {
+        title: "Z",
+        range: [-axisRange + origin[2], axisRange + origin[2]],
+      },
       aspectmode: "cube",
       camera: {
         up: { x: 0, y: 0, z: 1 },
